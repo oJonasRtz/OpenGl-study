@@ -1,4 +1,3 @@
-
 #extension GL_OES_standard_derivatives : enable
 
 #ifdef GL_ES
@@ -29,10 +28,7 @@ varying vec4 pos;
 void main(void)
 {
 	pos = a_position;
-	//Make it move
-	pos.y += (sin(u_time) / 2.);
 
-	//Draw display
 	v_position = a_position;
 	v_position.z = 0.;
 	v_normal = a_normal;
@@ -60,15 +56,33 @@ varying vec4 pos;
 
 void main()
 {
-	//Set line
-	float fadeFactor = smoothstep(0., 1., abs(pos.y));
+    //Set center and colours
+    vec2    lightCenter     = vec2(0., 0.);
+    vec4	black	        = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4	yellow	        = vec4(1., 1., .0, 1.);
+    vec4    white           = vec4(1., 1., 1., 1.);
 
-	//Set colours
-	vec4	blue	= vec4(0., 0.0, 1.0, .5);
-	vec4	pink	= vec4(1., 0., 1., .7);
-	vec4	finalColour = mix(pink, blue, fadeFactor);
+    //Yellow circle(outerCircle)
+    float distanceToCenter = distance(pos.xy, lightCenter);
+    float minSoftness       = 0.7;
+    float maxSoftness       = 1.;
+    float oscillation       = sin(u_time) / 10.;
+    float radius            = mix(0.2, 0.4, oscillation);
+    float edgeSoftness      = mix(minSoftness, maxSoftness, oscillation);
+	float fadeFactor        = smoothstep(radius, edgeSoftness, distanceToCenter);
 
-	gl_FragColor = finalColour;
+    //White circle(innerCircle)
+    float innerRadius       = .01;
+    float innerEdgeSoftness = .45;
+    float innerFadeFactor   = smoothstep(innerRadius, innerEdgeSoftness, distanceToCenter);
+
+    //Mix colours
+    vec4    outerCircle = mix(yellow, black, fadeFactor);
+    vec4    innerCircle = mix(white, black, innerFadeFactor);
+
+    //Mix circles
+	vec4	finalCircle = mix(innerCircle, outerCircle, innerFadeFactor);
+	gl_FragColor = finalCircle;
 }
 
 #endif
