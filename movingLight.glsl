@@ -29,10 +29,8 @@ varying vec4 pos;
 void main(void)
 {
 	pos = a_position;
-	if (pos.y < 1.)
-		pos.y += (tan(u_time));
-	else if (pos.y >= 1.)
-		pos.y -= (tan(u_time));
+	pos.y += (sin(u_time)/.5);
+
 
 	v_position = a_position;
 	v_position.z = 0.;
@@ -63,7 +61,7 @@ void main()
 	
 	float fadeFactor = smoothstep(0., 1., abs(pos.y));
 	vec4	blue	= vec4(0., 0., 1., 1);
-	vec4	pink	= vec4(1., 0., 1., 1.);
+	vec4	pink	= vec4(1., 0., 1., .76);
 
 	vec4	finalColour = mix(pink, blue, fadeFactor);
 	gl_FragColor = finalColour;
